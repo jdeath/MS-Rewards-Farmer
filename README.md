@@ -107,6 +107,7 @@
 - Complete the daily set automatically
 - Complete punch cards automatically
 - Complete the others promotions automatically
+- Complete read to earn automatically
 - Headless Mode - _not recommended at all_
 - Multi-Account Management
 - Session storing
