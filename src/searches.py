@@ -20,6 +20,8 @@ from selenium.webdriver.support.wait import WebDriverWait
 from src.browser import Browser
 from src.utils import Utils
 
+from selenium.common.exceptions import NoSuchElementException
+from selenium.common.exceptions import StaleElementReferenceException
 
 class RetriesStrategy(Enum):
     """
@@ -177,13 +179,16 @@ class Searches:
                 time.sleep(1)
                 searchbar.send_keys(term)
                 time.sleep(1)
-                with contextlib.suppress(TimeoutException):
-                    WebDriverWait(self.webdriver, 20).until(
-                        expected_conditions.text_to_be_present_in_element_value(
-                            (By.ID, "sb_form_q"), term
-                        )
-                    )
-                    break
+                my_element_id = 'sb_form_q'
+                ignored_exceptions=(NoSuchElementException,StaleElementReferenceException,)
+                your_element = WebDriverWait(your_driver, some_timeout,ignored_exceptions=ignored_exceptions).until(expected_conditions.presence_of_element_located((By.ID, my_element_id)))
+                #with contextlib.suppress(TimeoutException):
+                #    WebDriverWait(self.webdriver, 20).until(
+                #        expected_conditions.text_to_be_present_in_element_value(
+                #            (By.ID, "sb_form_q"), term
+                #        )
+                #    )
+                #    break
                 logging.debug("error send_keys")
             else:
                 # todo Still happens occasionally, gotta be a fix
