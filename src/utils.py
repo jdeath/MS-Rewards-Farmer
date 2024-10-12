@@ -189,7 +189,6 @@ class Utils:
                 self.goToRewards()
 
     def getDailySetPromotions(self) -> list[dict]:
-        logging.info(self.getDashboardData())
         return self.getDashboardData()["dailySetPromotions"][
             date.today().strftime("%m/%d/%Y")
         ]
@@ -245,8 +244,9 @@ class Utils:
         return False
 
     def getAccountPoints(self) -> int:
-        return self.getBingInfo()["userInfo"]["balance"]
-
+        #return self.getBingInfo()["userInfo"]["balance"]
+        return self.getDashboardData()["userStatus"]["availablePoints"]
+        
     def getGoalPoints(self) -> int:
         return self.getDashboardData()["userStatus"]["redeemGoal"]["price"]
 
