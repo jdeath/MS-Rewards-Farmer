@@ -244,8 +244,13 @@ class Utils:
         return False
 
     def getAccountPoints(self) -> int:
-        #return self.getBingInfo()["userInfo"]["balance"]
-        return self.getDashboardData()["userStatus"]["availablePoints"]
+        bingInfo = self.getBingInfo()
+        if bingInfo:
+            logging.info("Get Points from getBingInfo")
+            return bingInfo["userInfo"]["balance"]
+        else:
+            logging.info("Get Points from getDashoardData")
+            return self.getDashboardData()["userStatus"]["availablePoints"]
         
     def getGoalPoints(self) -> int:
         return self.getDashboardData()["userStatus"]["redeemGoal"]["price"]
