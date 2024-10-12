@@ -246,10 +246,10 @@ class Utils:
     def getAccountPoints(self) -> int:
         bingInfo = self.getBingInfo()
         if bingInfo:
-            logging.info("Get Points from getBingInfo")
+            #logging.info("Get Points from getBingInfo")
             return bingInfo["userInfo"]["balance"]
         else:
-            logging.info("Get Points from getDashoardData")
+            logging.info("Error - Fallback to Get Points from getDashoardData")
             return self.getDashboardData()["userStatus"]["availablePoints"]
         
     def getGoalPoints(self) -> int:
