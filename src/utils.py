@@ -189,6 +189,7 @@ class Utils:
                 self.goToRewards()
 
     def getDailySetPromotions(self) -> list[dict]:
+        logging.info(self.getDashboardData())
         return self.getDashboardData()["dailySetPromotions"][
             date.today().strftime("%m/%d/%Y")
         ]
