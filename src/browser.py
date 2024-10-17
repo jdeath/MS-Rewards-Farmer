@@ -275,11 +275,11 @@ class Browser:
     def getRemainingSearches(
         self, desktopAndMobile: bool = False
     ) -> RemainingSearches | int:
-        bingInfo = self.utils.getBingInfo()
+        userStatus = self.utils.getDashboardData()["userStatus"]
         searchPoints = 1
-        counters = bingInfo["flyoutResult"]["userStatus"]["counters"]
-        pcSearch: dict = counters["PCSearch"][0]
-        mobileSearch: dict = counters["MobileSearch"][0]
+        counters = userStatus["counters"]
+        pcSearch: dict = counters["pcSearch"][0]
+        mobileSearch: dict = counters["mobileSearch"][0]
         pointProgressMax: int = pcSearch["pointProgressMax"]
 
         searchPoints: int
