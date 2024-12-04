@@ -141,27 +141,27 @@ class GenerateUserAgent:
         )
         data = response.json()
         if stableProduct := next(
-            (product for product in data if product["product"] == "Stable"),
+            (product for product in data if product["Product"] == "Stable"),
             None,
         ):
-            releases = stableProduct["releases"]
+            releases = stableProduct["Releases"]
             androidRelease = next(
-                (release for release in releases if release["platform"] == "Android"),
+                (release for release in releases if release["Platform"] == "Android"),
                 None,
             )
             windowsRelease = next(
                 (
                     release
                     for release in releases
-                    if release["platform"] == "Windows"
-                    and release["architecture"] == "x64"
+                    if release["Platform"] == "Windows"
+                    and release["Architecture"] == "x64"
                 ),
                 None,
             )
             if androidRelease and windowsRelease:
                 return (
-                    windowsRelease["productVersion"],
-                    androidRelease["productVersion"],
+                    windowsRelease["ProductVersion"],
+                    androidRelease["ProductVersion"],
                 )
         raise HTTPError("Failed to get Edge versions.")
 
