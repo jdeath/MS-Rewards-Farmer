@@ -71,7 +71,7 @@ class Utils:
         # self.config = self.loadConfig()
 
     def waitUntilVisible(
-        self, by: str, selector: str, timeToWait: float = 10
+        self, by: str, selector: str, timeToWait: float = 60
     ) -> WebElement:
         return WebDriverWait(self.webdriver, timeToWait).until(
             expected_conditions.visibility_of_element_located((by, selector))
