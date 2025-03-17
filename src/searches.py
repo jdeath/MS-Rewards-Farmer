@@ -104,6 +104,8 @@ class Searches:
         pointsBefore = self.browser.utils.getAccountPoints()
 
         trend = list(self.googleTrendsShelf.keys())[0]
+        logging.info("Trend: " + trend)
+        logging.info("Trend: " + self.googleTrendsShelf[trend])
         trendKeywords = self.googleTrendsShelf[trend].trend_keywords
         logging.debug(f"trendKeywords={trendKeywords}")
         trendKeywordsCycle: cycle[str] = cycle(trendKeywords)
