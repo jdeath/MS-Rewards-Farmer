@@ -105,12 +105,15 @@ class Searches:
 
         trend = list(self.googleTrendsShelf.keys())[0]
         logging.info("Trend: " + trend)
-        logging.info("Trend: " + str(self.googleTrendsShelf[trend]))
+        logging.info("Trend Details " + str(self.googleTrendsShelf[trend]))
 
         if self.googleTrendsShelf[trend] is None:
+            logging.info("Trend is empty, removing entry")
+            del self.googleTrendsShelf[list(self.googleTrendsShelf.keys())[0]]
             return
             
         trendKeywords = self.googleTrendsShelf[trend].trend_keywords
+        
         logging.debug(f"trendKeywords={trendKeywords}")
         trendKeywordsCycle: cycle[str] = cycle(trendKeywords)
         baseDelay = Searches.baseDelay
