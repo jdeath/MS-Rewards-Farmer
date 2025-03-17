@@ -105,7 +105,6 @@ class Searches:
 
         trend = list(self.googleTrendsShelf.keys())[0]
         logging.info("Trend: " + trend)
-        logging.info("Trend Details " + str(self.googleTrendsShelf[trend]))
 
         if self.googleTrendsShelf[trend] is None:
             logging.info("Trend is empty, removing entry")
@@ -114,10 +113,10 @@ class Searches:
             
         trendKeywords = self.googleTrendsShelf[trend].trend_keywords
         
-        logging.debug(f"trendKeywords={trendKeywords}")
+        logging.info(f"trendKeywords={trendKeywords}")
         trendKeywordsCycle: cycle[str] = cycle(trendKeywords)
         baseDelay = Searches.baseDelay
-        logging.debug(f"trend={trend}")
+        logging.info(f"trend={trend}")
 
         # todo If first 3 searches of day, don't retry since points register differently, will be a bit quicker
         for i in range(self.maxRetries + 1):
