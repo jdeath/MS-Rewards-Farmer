@@ -7,6 +7,8 @@ from time import sleep
 from typing import Final
 
 from selenium.webdriver.common.by import By
+from selenium.common.exceptions import TimeoutException
+
 from trendspy import Trends
 
 from src.browser import Browser
@@ -132,19 +134,26 @@ class Searches:
                     f" seconds..."
                 )
                 sleep(sleepTime)
-
-            self.browser.utils.goToSearch()
-            searchbar = self.browser.utils.waitUntilClickable(
-                By.ID, "sb_form_q", timeToWait=40
-            )
-            searchbar.clear()
+            
             trendKeyword = trendKeywords.pop(0)
-            logging.debug(f"trendKeyword={trendKeyword}")
-            sleep(1)
-            searchbar.send_keys(trendKeyword)
-            sleep(1)
-            searchbar.submit()
-
+            
+            max_attempts = 3
+            for _ in range(max_attempts):
+            try:
+                self.browser.utils.goToSearch()
+                searchbar = self.browser.utils.waitUntilClickable(
+                    By.ID, "sb_form_q", timeToWait=40
+                )
+                searchbar.clear()
+                sleep(1)
+                searchbar.send_keys(trendKeyword)
+                sleep(1)
+                searchbar.submit()
+                break # Exit the loop if successful
+            except urllib3.exceptions.ReadTimeoutError:
+                logging.error("[BING] Timeout Error Retrying")
+                continue 
+            
             pointsAfter = self.browser.utils.getAccountPoints()
             if pointsBefore < pointsAfter:
                 del self.googleTrendsShelf[trend]
