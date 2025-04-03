@@ -20,6 +20,9 @@ from apprise import Apprise
 from requests import Session
 from requests.adapters import HTTPAdapter
 from selenium.common import (
+    ElementClickInterceptedException,
+    ElementNotInteractableException,
+    NoSuchElementException,
     TimeoutException,
 )
 from selenium.webdriver.chrome.webdriver import WebDriver
@@ -204,6 +207,8 @@ DEFAULT_CONFIG: Config = Config(
                 "How's the economy?": "sp 500",
                 "Learn to cook a new recipe": "how cook pierogi",
                 "Learn a new recipe": "how cook pierogi",
+                "Learn song lyrics": "hook blues traveler lyrics",
+                "Lights, camera, action!": "lord of the rings movie",
                 "Let's watch that movie again!": "aliens movie",
                 "Plan a quick getaway": "flights nyc to paris",
                 "Prepare for the weather": "weather tomorrow",
@@ -317,7 +322,7 @@ class Utils:
 
         response = session.get("https://www.bing.com/rewards/panelflyout/getuserinfo")
 
-        assert response.status_code == requests.codes.ok # pylint: disable=no-member
+        assert response.status_code == requests.codes.ok  # pylint: disable=no-member
         # fixme Add more asserts
         # todo Add fallback to src.utils.Utils.getDashboardData (slower but more reliable)
         return response.json()
@@ -350,6 +355,30 @@ class Utils:
             return self.getBingInfo()["flyoutResult"]["userGoal"]["title"]
         return self.getDashboardData()["userStatus"]["redeemGoal"]["title"]
 
+    def tryDismissAllMessages(self) -> None:
+        byValues = [
+            (By.ID, "iLandingViewAction"),
+            (By.ID, "iShowSkip"),
+            (By.ID, "iNext"),
+            (By.ID, "iLooksGood"),
+            (By.ID, "idSIButton9"),
+            (By.ID, "bnp_btn_accept"),
+            (By.ID, "acceptButton"),
+            (By.CSS_SELECTOR, ".dashboardPopUpPopUpSelectButton"),
+        ]
+        for byValue in byValues:
+            dismissButtons = []
+            with contextlib.suppress(NoSuchElementException):
+                dismissButtons = self.webdriver.find_elements(
+                    by=byValue[0], value=byValue[1]
+                )
+            for dismissButton in dismissButtons:
+                dismissButton.click()
+        with contextlib.suppress(NoSuchElementException):
+            self.webdriver.find_element(By.ID, "cookie-banner").find_element(
+                By.TAG_NAME, "button"
+            ).click()
+
     def switchToNewTab(self, timeToWait: float = 10, closeTab: bool = False) -> None:
         time.sleep(timeToWait)
         self.webdriver.switch_to.window(window_name=self.webdriver.window_handles[1])
@@ -362,13 +391,30 @@ class Utils:
         self.webdriver.switch_to.window(window_name=self.webdriver.window_handles[0])
         time.sleep(0.5)
 
+    def click(self, element: WebElement) -> None:
+        try:
+            WebDriverWait(self.webdriver, 10).until(
+                expected_conditions.element_to_be_clickable(element)
+            ).click()
+        except (
+            TimeoutException,
+            ElementClickInterceptedException,
+            ElementNotInteractableException,
+        ):
+            self.tryDismissAllMessages()
+            with contextlib.suppress(TimeoutException):
+                WebDriverWait(self.webdriver, 10).until(
+                    expected_conditions.element_to_be_clickable(element)
+                )
+            element.click()
+
 
 def argumentParser() -> Namespace:
     parser = ArgumentParser(
         description="A simple bot that uses Selenium to farm M$ Rewards in Python",
         epilog="At least one account should be specified,"
-               " either using command line arguments or a configuration file."
-               "\nAll specified arguments will override the configuration file values.",
+        " either using command line arguments or a configuration file."
+        "\nAll specified arguments will override the configuration file values.",
     )
     parser.add_argument(
         "-c",
@@ -382,7 +428,7 @@ def argumentParser() -> Namespace:
         "--create-config",
         action="store_true",
         help="Create a fillable configuration file with basic settings"
-             " and given ones if none exists",
+        " and given ones if none exists",
     )
     parser.add_argument(
         "-v",
@@ -426,7 +472,7 @@ def argumentParser() -> Namespace:
         type=str,
         default=None,
         help="Global Proxy, supports http/https/socks4/socks5"
-             " (overrides config per-account proxies)"
+        " (overrides config per-account proxies)"
         "\n`(ex: http://user:pass@host:port)`",
     )
     parser.add_argument(
@@ -453,7 +499,7 @@ def argumentParser() -> Namespace:
         "--reset",
         action="store_true",
         help="Delete the session folder and temporary files and kill"
-             " all chrome processes. Can help resolve issues.",
+        " all chrome processes. Can help resolve issues.",
     )
     return parser.parse_args()
 
@@ -590,8 +636,8 @@ def resetBot():
         print(f"Deleting file '{path}'")
         path.unlink(missing_ok=True)
 
-    for proc in psutil.process_iter(['pid', 'name']):
-        if proc.info['name'] == "chrome.exe":
+    for proc in psutil.process_iter(["pid", "name"]):
+        if proc.info["name"] == "chrome.exe":
             proc.kill()
 
     print("All chrome processes killed")
@@ -683,6 +729,7 @@ def cooldown() -> None:
     cooldownTime = random.randint(CONFIG.cooldown.min, CONFIG.cooldown.max)
     logging.info(f"[COOLDOWN] Waiting for {cooldownTime} seconds")
     time.sleep(cooldownTime)
+
 
 CONFIG = loadConfig()
 APPRISE = initApprise()
