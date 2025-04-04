@@ -138,8 +138,12 @@ class Searches:
             
             trendKeyword = trendKeywords.pop(0)
             
-            max_attempts = 3
-            for _ in range(max_attempts):
+            max_attempts = 4
+            for attempt in range(max_attempts):
+                if attempt == max_attempts - 1:
+                    logging.error("[BING] Exiting from Search")
+                    return
+                    
                 try:
                     self.browser.utils.goToSearch()
                     searchbar = self.browser.utils.waitUntilClickable(
