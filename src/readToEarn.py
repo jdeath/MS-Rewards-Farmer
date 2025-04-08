@@ -55,7 +55,11 @@ class ReadToEarn:
             if i == 5 or i == 10:
                 authorization_url = mobileApp.authorization_url(authorization_base_url, access_type="offline_access", login_hint=accountName)[0]
                 self.webdriver.get(authorization_url)
-
+                
+        if i == 15:
+            logging.info("[READ TO EARN] Logged-in Failed. Exiting !")
+            return
+            
         logging.info("[READ TO EARN] Logged-in successfully !")
         token = mobileApp.fetch_token(
             token_url, authorization_response=redirect_response, include_client_id=True
