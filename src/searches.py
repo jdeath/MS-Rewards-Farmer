@@ -157,6 +157,7 @@ class Searches:
                     break # Exit the loop if successful
                 except urllib3.exceptions.ReadTimeoutError:
                     logging.error("[BING] Timeout Error Retrying")
+                    cooldown()
                     continue 
             
             pointsAfter = self.browser.utils.getAccountPoints()
